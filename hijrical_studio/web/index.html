@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hijrical · Hicri Takvim Stüdyosu</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;🌙&lt;/text&gt;&lt;/svg&gt;" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">🌙</span>
+        <div>
+          <h1 data-i18n="appTitle">Hicri Takvim Stüdyosu</h1>
+          <p class="sub"><code>hijrical</code> <span id="version"></span> · <span data-i18n="appSub">tüm özellikleri deneyin</span></p>
+        </div>
+      </div>
+      <div class="header-controls">
+        <div class="engine-chip" id="engineChip" title="Hesaplama motoru">
+          <span class="engine-dot"></span>
+          <span id="engineLabel">Aritmetik</span>
+          <span class="chev">⚙</span>
+        </div>
+        <button class="icon-btn" id="themeBtn" title="Tema">🌙</button>
+        <div class="lang-switch" id="langSwitch"></div>
+      </div>
+    </header>
+
+    <!-- Engine settings popover -->
+    <div class="popover-backdrop" id="enginePop" hidden>
+      <div class="popover">
+        <div class="pop-head">
+          <h3 data-i18n="engineTitle">Hesaplama Motoru</h3>
+          <button class="x" data-close-pop>✕</button>
+        </div>
+        <div class="seg" id="engineSeg">
+          <button data-engine="arithmetic" class="active" data-i18n="arithmetic">Aritmetik (tablo)</button>
+          <button data-engine="astronomical" data-i18n="astronomical">Astronomik (hilal)</button>
+        </div>
+
+        <div id="arithPanel" class="engine-panel">
+          <label data-i18n="variant">Tablo varyantı</label>
+          <select id="variantSel"></select>
+          <p class="hint" data-i18n="variantHint">Aritmetik motor tersine çevrilebilir ve sınırsız tarih aralığına sahiptir.</p>
+        </div>
+
+        <div id="astroPanel" class="engine-panel" hidden>
+          <label data-i18n="observer">Gözlemci (konum)</label>
+          <select id="obsSel"></select>
+          <div id="customObs" class="custom-obs" hidden>
+            <div class="grid2">
+              <div><label>Enlem</label><input id="obsLat" type="number" step="0.0001" value="41.0082" /></div>
+              <div><label>Boylam</label><input id="obsLon" type="number" step="0.0001" value="28.9784" /></div>
+              <div><label>UTC ofset</label><input id="obsTz" type="number" step="0.5" value="3" /></div>
+              <div><label data-i18n="name">İsim</label><input id="obsName" type="text" value="Özel" /></div>
+            </div>
+          </div>
+          <button class="btn block" id="eng_map" style="margin-top:10px">🗺️ <span data-i18n="pickOnMap">Haritadan konum seç</span></button>
+          <label data-i18n="criterion">Görünürlük kriteri</label>
+          <select id="critSel"></select>
+          <p class="hint" id="critDesc"></p>
+          <label data-i18n="scope">Kapsam</label>
+          <div class="seg small" id="scopeSeg">
+            <button data-scope="local" class="active" data-i18n="local">Yerel</button>
+            <button data-scope="global" data-i18n="global">Küresel</button>
+          </div>
+          <p class="hint" data-i18n="astroHint">Astronomik motor gerçek hilal görünürlüğünü modeller; 1–1600 H aralığında geçerlidir ve daha yavaştır.</p>
+        </div>
+
+        <button class="btn primary block" data-close-pop data-i18n="apply">Uygula</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <nav class="tabs" id="tabs">
+      <button data-tab="convert" class="active"><span>🔁</span><span data-i18n="tabConvert">Dönüştürücü</span></button>
+      <button data-tab="calendar"><span>📅</span><span data-i18n="tabCalendar">Takvim</span></button>
+      <button data-tab="holidays"><span>🕌</span><span data-i18n="tabHolidays">Dini Günler</span></button>
+      <button data-tab="crescent"><span>🌒</span><span data-i18n="tabCrescent">Hilal Görünürlüğü</span></button>
+      <button data-tab="tools"><span>🧮</span><span data-i18n="tabTools">Araçlar</span></button>
+    </nav>
+
+    <main id="main">
+      <!-- CONVERT -->
+      <section data-panel="convert" class="panel active">
+        <div class="cards2">
+          <div class="card">
+            <h2><span>📆</span> <span data-i18n="g2h">Miladi → Hicri</span></h2>
+            <div class="row3">
+              <div><label data-i18n="day">Gün</label><input id="g_day" type="number" min="1" max="31" /></div>
+              <div><label data-i18n="month">Ay</label><input id="g_month" type="number" min="1" max="12" /></div>
+              <div><label data-i18n="year">Yıl</label><input id="g_year" type="number" /></div>
+            </div>
+            <label class="toggle-line"><input type="checkbox" id="g_useTime" />
+              <span data-i18n="timeSensitive">Saat & konuma göre (gün batımı sınırı)</span></label>
+            <div id="g_timeRow" class="time-row" hidden>
+              <div><label data-i18n="time">Saat</label><input id="g_time" type="time" value="20:00" /></div>
+              <div><label data-i18n="observer">Konum</label><select id="g_obs"></select></div>
+            </div>
+            <div class="btnrow">
+              <button class="btn" id="g_today" data-i18n="today">Bugün</button>
+              <button class="btn primary" id="g_go" data-i18n="convert">Dönüştür</button>
+            </div>
+            <div class="result" id="g_result"></div>
+          </div>
+
+          <div class="card">
+            <h2><span>🌙</span> <span data-i18n="h2g">Hicri → Miladi</span></h2>
+            <div class="row3">
+              <div><label data-i18n="day">Gün</label><input id="h_day" type="number" min="1" max="30" /></div>
+              <div><label data-i18n="month">Ay</label><input id="h_month" type="number" min="1" max="12" /></div>
+              <div><label data-i18n="year">Yıl</label><input id="h_year" type="number" /></div>
+            </div>
+            <div class="btnrow">
+              <button class="btn" id="h_today" data-i18n="today">Bugün</button>
+              <button class="btn primary" id="h_go" data-i18n="convert">Dönüştür</button>
+            </div>
+            <div class="result" id="h_result"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CALENDAR -->
+      <section data-panel="calendar" class="panel">
+        <div class="cal-toolbar">
+          <div class="cal-toggles">
+            <div class="view-seg" id="layoutSeg">
+              <button data-layout="hijri" class="active" data-i18n="hijriLayout">🌙 Hicri</button>
+              <button data-layout="greg" data-i18n="gregLayout">📆 Miladi</button>
+            </div>
+            <div class="view-seg" id="viewSeg">
+              <button data-view="month" class="active" data-i18n="monthView">Ay</button>
+              <button data-view="year" data-i18n="yearView">Yıl</button>
+            </div>
+          </div>
+          <div class="cal-actions">
+            <button class="btn" id="cal_ics">📅 ICS</button>
+            <button class="btn" id="cal_print">🖨️ <span data-i18n="print">Yazdır</span></button>
+          </div>
+        </div>
+        <div class="cal-head">
+          <button class="navbtn" id="cal_prev">‹</button>
+          <div class="cal-title">
+            <h2 id="cal_title">—</h2>
+            <span class="badge" id="cal_engine"></span>
+          </div>
+          <button class="navbtn" id="cal_next">›</button>
+          <div class="cal-jump">
+            <input id="cal_year" type="number" />
+            <select id="cal_month"></select>
+            <button class="btn" id="cal_go" data-i18n="show">Göster</button>
+            <button class="btn" id="cal_today_btn" data-i18n="today">Bugün</button>
+          </div>
+        </div>
+        <div id="calGrid" class="cal-grid"></div>
+        <div id="calYear" class="year-grid" hidden></div>
+        <div class="legend" id="calLegend"></div>
+      </section>
+
+      <!-- HOLIDAYS -->
+      <section data-panel="holidays" class="panel">
+        <div class="card soft">
+          <h2><span>⏳</span> <span data-i18n="upcomingTitle">Yaklaşan Dini Günler</span></h2>
+          <div id="upcoming" class="upcoming"></div>
+        </div>
+        <div class="card">
+          <div class="hol-head">
+            <h2><span>🕌</span> <span data-i18n="yearHolidaysTitle">Yıla Göre Dini Günler</span></h2>
+            <div class="cal-jump">
+              <label data-i18n="hijriYear">Hicri yıl</label>
+              <input id="hol_year" type="number" />
+              <button class="btn primary" id="hol_go" data-i18n="list">Listele</button>
+              <button class="btn" id="hol_ics">📅 ICS</button>
+              <button class="btn" id="hol_print">🖨️ <span data-i18n="print">Yazdır</span></button>
+            </div>
+          </div>
+          <div id="holidayList" class="holiday-list"></div>
+        </div>
+      </section>
+
+      <!-- CRESCENT -->
+      <section data-panel="crescent" class="panel">
+        <div class="card">
+          <h2><span>🌒</span> <span data-i18n="crescentTitle">Hilal Görünürlüğü</span></h2>
+          <p class="hint" data-i18n="crescentHint">Bir konum, kriter ve akşam için yeni hilalin görünüp görünmediğini (ve ayın başlayıp başlamayacağını) hesaplayın.</p>
+          <div class="row4">
+            <div><label data-i18n="observer">Gözlemci</label><select id="cr_obs"></select></div>
+            <div><label data-i18n="criterion">Kriter</label><select id="cr_crit"></select></div>
+            <div><label data-i18n="date">Miladi tarih</label><input id="cr_date" type="date" /></div>
+            <div class="endcol"><button class="btn primary" id="cr_go" data-i18n="compute">Hesapla</button></div>
+          </div>
+          <div class="btnrow">
+            <button class="btn" id="cr_map">🗺️ <span data-i18n="pickOnMap">Haritadan konum seç</span></button>
+            <span class="chip-coords" id="cr_coords" hidden></span>
+          </div>
+          <div id="cr_result" class="cr-result"></div>
+        </div>
+
+        <div class="card soft">
+          <h2><span>🌍</span> <span data-i18n="compareTitle">Şehirlere Göre Karşılaştırma</span></h2>
+          <p class="hint" data-i18n="compareHint">Aynı akşam için farklı şehirlerde hilalin görünürlüğü — Ramazan'ın neden bazı ülkelerde bir gün geç başladığını gösterir.</p>
+          <div class="row4">
+            <div><label data-i18n="criterion">Kriter</label><select id="cmp_crit"></select></div>
+            <div><label data-i18n="date">Miladi tarih</label><input id="cmp_date" type="date" /></div>
+            <div class="endcol"><button class="btn primary" id="cmp_go" data-i18n="compareBtn">Karşılaştır</button></div>
+          </div>
+          <div id="cmp_result"></div>
+        </div>
+      </section>
+
+      <!-- TOOLS -->
+      <section data-panel="tools" class="panel">
+        <div class="cards2">
+          <div class="card">
+            <h2><span>🎂</span> <span data-i18n="ageTitle">Hicri Yaş Hesaplayıcı</span></h2>
+            <p class="hint" data-i18n="ageHint">Miladi doğum tarihinizi girin; Hicri doğum tarihiniz, Hicri yaşınız ve sonraki Hicri doğum gününüze kalan gün gösterilir.</p>
+            <label data-i18n="birthDate">Miladi doğum tarihi</label>
+            <input id="age_date" type="date" />
+            <button class="btn primary block" id="age_go" data-i18n="compute">Hesapla</button>
+            <div id="age_result" class="tool-out"></div>
+          </div>
+
+          <div class="card">
+            <h2><span>➕</span> <span data-i18n="arithTitle">Tarih Aritmetiği</span></h2>
+            <div class="seg" id="arithSeg">
+              <button data-op="add" class="active" data-i18n="addDays">Gün ekle/çıkar</button>
+              <button data-op="diff" data-i18n="dateDiff">İki tarih farkı</button>
+            </div>
+            <div id="arithAdd">
+              <label data-i18n="hijriDateGAY">Hicri tarih (Gün / Ay / Yıl)</label>
+              <div class="row3"><input id="ar_d" type="number" value="1" /><input id="ar_m" type="number" value="9" /><input id="ar_y" type="number" value="1447" /></div>
+              <label data-i18n="addDaysLabel">Eklenecek gün (negatif olabilir)</label>
+              <input id="ar_days" type="number" value="40" />
+            </div>
+            <div id="arithDiff" hidden>
+              <label data-i18n="firstDate">1. Hicri tarih (G / A / Y)</label>
+              <div class="row3"><input id="ar2_d" type="number" value="1" /><input id="ar2_m" type="number" value="1" /><input id="ar2_y" type="number" value="1447" /></div>
+              <label data-i18n="secondDate">2. Hicri tarih (G / A / Y)</label>
+              <div class="row3"><input id="ar3_d" type="number" value="1" /><input id="ar3_m" type="number" value="1" /><input id="ar3_y" type="number" value="1448" /></div>
+            </div>
+            <button class="btn primary block" id="ar_go" data-i18n="compute">Hesapla</button>
+            <div id="ar_result" class="tool-out"></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="foot">
+      <span data-i18n="footer">Yerel <code>hijrical</code> kaynağı doğrudan çağrılır · saf Python, sıfır bağımlılık</span>
+    </footer>
+  </div>
+
+  <!-- Day detail modal -->
+  <div class="modal-backdrop" id="dayModal" hidden>
+    <div class="modal">
+      <button class="x" id="dayModalClose">✕</button>
+      <div id="dayModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Map picker modal -->
+  <div class="modal-backdrop" id="mapModal" hidden>
+    <div class="modal map-modal">
+      <button class="x" id="mapModalClose">✕</button>
+      <h3><span>🗺️</span> <span data-i18n="pickOnMap">Haritadan konum seç</span></h3>
+      <p class="hint" data-i18n="mapHint">Haritaya tıklayarak gözlemci konumunu seçin. Saat dilimi boylamdan tahmin edilir.</p>
+      <div id="leafletMap"></div>
+      <div class="map-coords" id="mapCoords">—</div>
+      <button class="btn primary block" id="mapUse" data-i18n="useLocation">Bu konumu kullan</button>
+    </div>
+  </div>
+
+  <!-- Pyodide loading overlay (shown only in the in-browser/static build) -->
+  <div class="boot-overlay" id="bootOverlay" hidden>
+    <div class="boot-box">
+      <div class="boot-moon">🌙</div>
+      <div class="boot-title">hijrical Studio</div>
+      <div class="boot-status" id="bootStatus">Yükleniyor…</div>
+      <div class="boot-sub" data-i18n="bootSub">Kütüphane tarayıcınızda Pyodide ile çalışıyor; ilk yükleme birkaç saniye sürebilir.</div>
+      <div class="boot-bar"><span></span></div>
+    </div>
+  </div>
+
+  <script src="boot.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hijrical-studio"
+version = "1.0.0"
+description = "Interactive web playground for the hijrical Hijri <-> Gregorian date library — runs locally or fully in the browser via Pyodide."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "kbycode" }]
+requires-python = ">=3.9"
+dependencies = ["hijrical>=1.1.1"]
+keywords = [
+    "hijri", "islamic-calendar", "hijri-calendar", "playground", "gui",
+    "pyodide", "crescent", "moon-sighting", "ircica", "date-conversion",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Topic :: Religion",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+
+[project.urls]
+Homepage = "https://github.com/kbycode/hijrical-studio"
+"Live demo" = "https://kbycode.github.io/hijrical-studio/"
+"hijrical (library)" = "https://pypi.org/project/hijrical/"
+
+[project.scripts]
+hijrical-studio = "hijrical_studio.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["hijrical_studio"]
+
+# Ship the front-end assets (html/css/js) and the in-browser API module that
+# live inside the package alongside the Python code.
+[tool.hatch.build.targets.wheel.force-include]
+"hijrical_studio/web" = "hijrical_studio/web"
+
+[tool.hatch.build.targets.sdist]
+include = ["hijrical_studio", "run.py", "README.md", "LICENSE", "pyproject.toml"]
