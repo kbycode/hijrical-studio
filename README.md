@@ -7,11 +7,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-f5c451.svg)](LICENSE)
 ![Python](https://img.shields.io/badge/python-3.9+-blue)
 
-> The UI ships in **Turkish, English and Arabic** (with automatic RTL) and a dark/light theme.
+> The UI ships in **English, Turkish and Arabic** (with automatic RTL) and a dark/light theme.
 
-<!-- Add a screenshot at docs/screenshot.png to show it here:
-![hijrical Studio](docs/screenshot.png)
--->
+<p align="center">
+  <a href="https://kbycode.github.io/hijrical-studio/">
+    <img src="docs/screenshot.png" alt="hijrical Studio — Hijri/Gregorian dual calendar with marked religious days" width="820">
+  </a>
+</p>
 
 ## ▶️ Try it now
 

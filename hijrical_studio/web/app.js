@@ -998,6 +998,11 @@ async function init() {
   applyTheme((() => { try { return localStorage.getItem("hj_theme") || "dark"; } catch (_) { return "dark"; } })());
   applyLang(LANG);
   doG2H();
+
+  // Deep-link to a tab, e.g. .../#calendar -- handy for sharing and screenshots.
+  const hashTab = location.hash.replace("#", "");
+  const hashBtn = hashTab && $(`#tabs button[data-tab="${hashTab}"]`);
+  if (hashBtn) hashBtn.click();
 }
 
 init();
