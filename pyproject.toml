@@ -10,7 +10,7 @@ readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "kbycode" }]
 requires-python = ">=3.9"
-dependencies = ["hijrical>=1.1.1"]
+dependencies = ["hijrical>=1.3.0"]
 keywords = [
     "hijri", "islamic-calendar", "hijri-calendar", "playground", "gui",
     "pyodide", "crescent", "moon-sighting", "ircica", "date-conversion",
