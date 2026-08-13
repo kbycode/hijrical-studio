@@ -49,6 +49,7 @@ const I18N = {
     g2h: "Miladi → Hicri", h2g: "Hicri → Miladi", day: "Gün", month: "Ay", year: "Yıl",
     today: "Bugün", convert: "Dönüştür", show: "Göster",
     upcomingTitle: "Yaklaşan Dini Günler", yearHolidaysTitle: "Yıla Göre Dini Günler",
+    nightNote: "gece bu akşam başlar",
     hijriYear: "Hicri yıl", list: "Listele", crescentTitle: "Hilal Görünürlüğü",
     crescentHint: "Bir konum, kriter ve akşam için yeni hilalin görünüp görünmediğini (ve ayın başlayıp başlamayacağını) hesaplayın.",
     date: "Miladi tarih", compute: "Hesapla", formatTitle: "Biçimlendirme", parseTitle: "Ayrıştırma",
@@ -88,6 +89,7 @@ const I18N = {
     g2h: "Gregorian → Hijri", h2g: "Hijri → Gregorian", day: "Day", month: "Month", year: "Year",
     today: "Today", convert: "Convert", show: "Show",
     upcomingTitle: "Upcoming Religious Days", yearHolidaysTitle: "Religious Days by Year",
+    nightNote: "the night begins this evening",
     hijriYear: "Hijri year", list: "List", crescentTitle: "Crescent Visibility",
     crescentHint: "Compute whether the new crescent is visible (and the month would begin) for a location, criterion and evening.",
     date: "Gregorian date", compute: "Compute", formatTitle: "Formatting", parseTitle: "Parsing",
@@ -126,6 +128,7 @@ const I18N = {
     g2h: "ميلادي ← هجري", h2g: "هجري ← ميلادي", day: "اليوم", month: "الشهر", year: "السنة",
     today: "اليوم", convert: "تحويل", show: "عرض",
     upcomingTitle: "المناسبات الدينية القادمة", yearHolidaysTitle: "المناسبات حسب السنة",
+    nightNote: "تبدأ الليلة هذا المساء",
     hijriYear: "السنة الهجرية", list: "عرض", crescentTitle: "رؤية الهلال",
     crescentHint: "احسب ما إذا كان الهلال الجديد مرئيًا (وبدء الشهر) لموقع ومعيار ومساء معيّن.",
     date: "تاريخ ميلادي", compute: "احسب", formatTitle: "التنسيق", parseTitle: "التحليل",
@@ -682,7 +685,7 @@ async function loadYearHolidays() {
         <div class="hl-icon">${HOLIDAY_EMOJI[rd.key] || "🕌"}</div>
         <div class="hl-main">
           <div class="hl-name">${rd.name} <span class="holiday-tag tag-${rd.kind}" style="font-size:10px;padding:2px 8px">${rd.kind_label}</span></div>
-          <div class="hl-sub">${rd.hijri_str} · ${rd.gregorian_long} (${rd.gregorian_weekday})${rd.eve ? " · 🌇 " + rd.eve : ""}</div>
+          <div class="hl-sub">${rd.hijri_str} · ${rd.gregorian_long} (${rd.gregorian_weekday})${rd.is_holy_night ? " · 🌇 " + t("nightNote") : ""}</div>
         </div>
         <div class="hl-cd"><span class="countdown ${cd.cls}">${cd.text}</span></div>
       </div>`;
@@ -697,7 +700,7 @@ function openHolidayModal(rd) {
     <h3>${rd.name}</h3>
     <div class="dm-greg">${rd.hijri_str} · ${rd.gregorian_long} (${rd.gregorian_weekday})</div>
     <div class="dm-desc">${rd.description || ""}</div>
-    ${rd.eve ? `<div class="hint">🌇 ${t("eveLabel")}: ${rd.eve}</div>` : ""}
+    ${rd.is_holy_night ? `<div class="hint">🌇 ${t("nightNote")} · ${rd.night_hijri_str}</div>` : ""}
     <div class="dm-cd ${cd.cls === "past" ? "past" : ""}">${cd.text}</div>`;
   $("#dayModal").hidden = false;
 }

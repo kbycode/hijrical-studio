@@ -166,27 +166,38 @@ def hijri_payload(hd: HijriDate, lang: str) -> dict:
 
 
 def rd_payload(rd, lang: str, today: date) -> dict:
-    g = rd.gregorian
+    """Serialize a religious day.
+
+    The primary date fields are the ones the day is **published/observed** on --
+    for a holy night, the evening it begins, which is what calendars print and
+    what people mean by "when is Mawlid". The Hijri day the night belongs to is
+    kept alongside as ``night_*`` so a UI can show both without ever displaying
+    the wrong day (or exporting it to a calendar file).
+    """
     loc = get_locale(lang)
+    g = rd.observed
+    oy, om, od = rd.observed_hijri_date
+    ny, nm, nd = rd.hijri
     return {
         "key": rd.key,
         "kind": rd.kind,
         "kind_label": _kind_label(lang, rd.kind),
         "name": rd.name(lang),
-        "hijri": list(rd.hijri),
-        "hijri_str": f"{rd.hijri[2]} {loc['months'][rd.hijri[1] - 1]} {rd.hijri[0]}",
+        "hijri": [oy, om, od],
+        "hijri_str": f"{od} {loc['months'][om - 1]} {oy}",
         "gregorian": g.isoformat(),
         "gregorian_long": g.strftime("%d.%m.%Y"),
         "gregorian_weekday": loc["weekdays"][g.weekday()],
-        "eve": rd.eve.isoformat() if rd.eve else None,
-        # The date the day is announced/observed on -- for a holy night that is
-        # the evening it begins, which is how Diyanet prints kandils.
-        "observed": rd.observed.isoformat(),
-        "observed_long": rd.observed.strftime("%d.%m.%Y"),
         "is_holy_night": rd.is_holy_night,
+        # The Hijri day a holy night belongs to (it starts the evening before).
+        "night_hijri_str": (f"{nd} {loc['months'][nm - 1]} {ny}"
+                            if rd.is_holy_night else None),
+        "night_gregorian": rd.gregorian.isoformat() if rd.is_holy_night else None,
+        "eve": rd.eve.isoformat() if rd.eve else None,
+        "observed": g.isoformat(),
         "day_index": rd.day_index,
         "description": _desc(lang, rd.key),
-        "days_until": (rd.observed - today).days,
+        "days_until": (g - today).days,
     }
 
 
