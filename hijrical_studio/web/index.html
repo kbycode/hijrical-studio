@@ -37,11 +37,17 @@
           <button class="x" data-close-pop>✕</button>
         </div>
         <div class="seg" id="engineSeg">
-          <button data-engine="arithmetic" class="active" data-i18n="arithmetic">Aritmetik (tablo)</button>
+          <button data-engine="diyanet" class="active" data-i18n="diyanet">Diyanet (Türkiye)</button>
+          <button data-engine="arithmetic" data-i18n="arithmetic">Aritmetik (tablo)</button>
           <button data-engine="astronomical" data-i18n="astronomical">Astronomik (hilal)</button>
         </div>
 
-        <div id="arithPanel" class="engine-panel">
+        <div id="diyanetPanel" class="engine-panel">
+          <p class="hint" data-i18n="diyanetHint">Diyanet İşleri Başkanlığı'nın resmî yayımlanmış takvimi. Yayımlanan yıllar için birebir aynıdır; sonrası için birleşik astronomik kurala düşer.</p>
+          <p class="hint" id="diyanetCoverage"></p>
+        </div>
+
+        <div id="arithPanel" class="engine-panel" hidden>
           <label data-i18n="variant">Tablo varyantı</label>
           <select id="variantSel"></select>
           <p class="hint" data-i18n="variantHint">Aritmetik motor tersine çevrilebilir ve sınırsız tarih aralığına sahiptir.</p>

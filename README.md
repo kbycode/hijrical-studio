@@ -15,6 +15,20 @@
   </a>
 </p>
 
+
+## Calculation engines
+
+The studio defaults to **Diyanet (Türkiye)** — Turkey's official published
+calendar, taken verbatim from Diyanet's tables, so the dates match the printed
+calendar exactly for the years they have published (currently 1443-06 … 1449-08).
+Beyond that range it falls back to the unified astronomical rule, and the
+converter marks each result as official or predicted.
+
+Two other engines are one click away: **Arithmetic** (a fixed tabular rule —
+reversible and unbounded, but not an observed calendar) and **Astronomical**
+(real crescent visibility for a chosen location and criterion).
+
+
 ## ▶️ Try it now
 
 **[kbycode.github.io/hijrical-studio](https://kbycode.github.io/hijrical-studio/)** — the live demo loads Pyodide and `micropip install`s the real `hijrical` package from PyPI, then runs everything client-side. No server, nothing to install.

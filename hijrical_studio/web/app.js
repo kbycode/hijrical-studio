@@ -14,7 +14,7 @@ let CUR = { year: 1447, month: 1, day: 1 };      // today in Hijri (filled at in
 let ACTIVE_TAB = "convert";
 
 const ENGINE = {
-  engine: "arithmetic", variant: "kuwaiti",
+  engine: "diyanet", variant: "kuwaiti",
   observer: "mecca", criterion: "ircica", scope: "local",
   lat: 41.0082, lon: 28.9784, tz: 3, obs_name: "Özel",
 };
@@ -37,7 +37,9 @@ const WD_ABBR = {
 const I18N = {
   tr: {
     appTitle: "Hicri Takvim Stüdyosu", appSub: "tüm özellikleri deneyin",
-    engineTitle: "Hesaplama Motoru", arithmetic: "Aritmetik (tablo)", astronomical: "Astronomik (hilal)",
+    engineTitle: "Hesaplama Motoru", diyanet: "Diyanet (Türkiye)", arithmetic: "Aritmetik (tablo)", astronomical: "Astronomik (hilal)",
+    diyanetHint: "Diyanet İşleri Başkanlığı'nın resmî yayımlanmış takvimi. Yayımlanan yıllar için birebir aynıdır; sonrası için birleşik astronomik kurala düşer.",
+    officialBadge: "resmî", predictedBadge: "tahmini",
     variant: "Tablo varyantı", variantHint: "Aritmetik motor tersine çevrilebilir ve sınırsız tarih aralığına sahiptir.",
     observer: "Gözlemci (konum)", name: "İsim", criterion: "Görünürlük kriteri", scope: "Kapsam",
     local: "Yerel", global: "Küresel",
@@ -74,7 +76,9 @@ const I18N = {
   },
   en: {
     appTitle: "Hijri Calendar Studio", appSub: "try every feature",
-    engineTitle: "Calculation Engine", arithmetic: "Arithmetic (tabular)", astronomical: "Astronomical (crescent)",
+    engineTitle: "Calculation Engine", diyanet: "Diyanet (Türkiye)", arithmetic: "Arithmetic (tabular)", astronomical: "Astronomical (crescent)",
+    diyanetHint: "Turkey's official published calendar. Exact for the published years; falls back to the unified astronomical rule beyond them.",
+    officialBadge: "official", predictedBadge: "predicted",
     variant: "Tabular variant", variantHint: "The arithmetic engine is reversible and unbounded in range.",
     observer: "Observer (location)", name: "Name", criterion: "Visibility criterion", scope: "Scope",
     local: "Local", global: "Global",
@@ -110,7 +114,9 @@ const I18N = {
   },
   ar: {
     appTitle: "استوديو التقويم الهجري", appSub: "جرّب كل الميزات",
-    engineTitle: "محرك الحساب", arithmetic: "حسابي (جدولي)", astronomical: "فلكي (الهلال)",
+    engineTitle: "محرك الحساب", diyanet: "ديانت (تركيا)", arithmetic: "حسابي (جدولي)", astronomical: "فلكي (الهلال)",
+    diyanetHint: "التقويم الرسمي المنشور لرئاسة الشؤون الدينية التركية.",
+    officialBadge: "رسمي", predictedBadge: "تقديري",
     variant: "النمط الجدولي", variantHint: "المحرك الحسابي عكوسٌ وغير محدود المدى.",
     observer: "الموقع (الراصد)", name: "الاسم", criterion: "معيار الرؤية", scope: "النطاق",
     local: "محلي", global: "عالمي",
@@ -322,10 +328,11 @@ function updateCritDesc() {
 
 /* ---------------- engine popover ---------------- */
 function updateEngineChip() {
-  $("#engineLabel").textContent = ENGINE.engine === "astronomical"
+  if (ENGINE.engine === "diyanet") { $("#engineLabel").textContent = t("diyanet"); }
+  else $("#engineLabel").textContent = ENGINE.engine === "astronomical"
     ? `${t("astronomical").split(" ")[0]} · ${ENGINE.observer === "custom" ? ENGINE.obs_name : (META.observers.find(o => o.key === ENGINE.observer) || {}).name} · ${ENGINE.criterion}`
     : `${t("arithmetic").split(" ")[0]} · ${ENGINE.variant}`;
-  $("#engineChip").classList.toggle("astro", ENGINE.engine === "astronomical");
+  $("#engineChip").classList.toggle("astro", ENGINE.engine !== "arithmetic");
 }
 function openEnginePop() {
   $("#variantSel").value = ENGINE.variant;
@@ -335,6 +342,12 @@ function openEnginePop() {
   $$("#scopeSeg button").forEach(b => b.classList.toggle("active", b.dataset.scope === ENGINE.scope));
   $("#arithPanel").hidden = ENGINE.engine !== "arithmetic";
   $("#astroPanel").hidden = ENGINE.engine !== "astronomical";
+  const dp = $("#diyanetPanel"); if (dp) dp.hidden = ENGINE.engine !== "diyanet";
+  const cov = $("#diyanetCoverage");
+  if (cov && META.engines) {
+    const d = META.engines.find(e => e.key === "diyanet");
+    if (d) cov.textContent = `Resmî veri: ${d.official_from} … ${d.official_to} (hicri)`;
+  }
   $("#customObs").hidden = ENGINE.observer !== "custom";
   updateCritDesc();
   $("#enginePop").hidden = false;

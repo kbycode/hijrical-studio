@@ -25,6 +25,7 @@ import hijrical as hj
 from hijrical import (
     ArithmeticCalendar,
     AstronomicalCalendar,
+    DiyanetCalendar,
     HijriDate,
     Observer,
     PRESETS,
@@ -128,7 +129,9 @@ def build_observer(p: dict) -> Observer:
 
 
 def build_calendar(p: dict):
-    engine = (p or {}).get("engine", "arithmetic")
+    engine = (p or {}).get("engine", "diyanet")
+    if engine == "diyanet":
+        return DiyanetCalendar()
     if engine == "astronomical":
         return AstronomicalCalendar(
             build_observer(p),
@@ -153,6 +156,11 @@ def hijri_payload(hd: HijriDate, lang: str) -> dict:
         "is_leap_year": hd.is_leap_year(),
         "holiday_key": hj.holiday_key(hd.month, hd.day),
         "gregorian_long": hd.to_gregorian().strftime("%d.%m.%Y"),
+        "engine": hd.calendar.name,
+        # For the Diyanet engine: is this month straight from the official
+        # published table, or the astronomical fallback beyond it?
+        "official": (hd.calendar.is_official(hd.year, hd.month)
+                     if isinstance(hd.calendar, DiyanetCalendar) else None),
     })
     return d
 
@@ -171,10 +179,14 @@ def rd_payload(rd, lang: str, today: date) -> dict:
         "gregorian_long": g.strftime("%d.%m.%Y"),
         "gregorian_weekday": loc["weekdays"][g.weekday()],
         "eve": rd.eve.isoformat() if rd.eve else None,
+        # The date the day is announced/observed on -- for a holy night that is
+        # the evening it begins, which is how Diyanet prints kandils.
+        "observed": rd.observed.isoformat(),
+        "observed_long": rd.observed.strftime("%d.%m.%Y"),
         "is_holy_night": rd.is_holy_night,
         "day_index": rd.day_index,
         "description": _desc(lang, rd.key),
-        "days_until": (g - today).days,
+        "days_until": (rd.observed - today).days,
     }
 
 
@@ -191,8 +203,16 @@ def api_meta(_p: dict) -> dict:
             "months": list(loc["months"]), "weekdays": list(loc["weekdays"]),
             "holidays": dict(loc["holidays"]),
         }
+    diy = DiyanetCalendar()
+    (cf_y, cf_m), (ct_y, ct_m) = diy.coverage()
     return {
         "version": hj.__version__,
+        "engines": [
+            {"key": "diyanet", "label": "Diyanet (Türkiye)",
+             "official_from": f"{cf_y}-{cf_m:02d}", "official_to": f"{ct_y}-{ct_m:02d}"},
+            {"key": "arithmetic", "label": "Arithmetic"},
+            {"key": "astronomical", "label": "Astronomical"},
+        ],
         "languages": available_languages(),
         "default_language": "en",
         "criteria": [{"name": k, "description": get_criterion(k).description}
@@ -303,7 +323,8 @@ def _holiday_dict(rd, lang, g, today):
         "name": rd.name(lang), "description": _desc(lang, rd.key),
         "is_holy_night": rd.is_holy_night,
         "eve": rd.eve.isoformat() if rd.eve else None,
-        "days_until": (g - today).days,
+        "observed": rd.observed.isoformat(),
+        "days_until": (rd.observed - today).days,
     }
 
 
