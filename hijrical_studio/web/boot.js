@@ -44,7 +44,7 @@
     const pyodide = await loadPyodide();
     setStatus("hijrical paketi PyPI'dan kuruluyor…");
     await pyodide.loadPackage("micropip");
-    await pyodide.runPythonAsync('import micropip\nawait micropip.install("hijrical>=1.2.1")');
+    await pyodide.runPythonAsync('import micropip\nawait micropip.install("hijrical>=1.3.0")');
     setStatus("API hazırlanıyor…");
     const src = await (await fetch("studio_api.py")).text();
     pyodide.FS.writeFile("studio_api.py", src);
