@@ -310,14 +310,22 @@ def _greg_short(g, lang):
 
 
 def _build_index(cal, year):
-    """Holiday lookup for a whole Hijri year, indexed by (month, day)."""
+    """Holiday lookup for a whole Hijri year, indexed by (month, day).
+
+    Keyed on the date each day is *marked* on: for a holy night that is the
+    evening it begins, so a calendar cell and the religious-day list always name
+    the same Gregorian day (Mawlid shows on 11 Rabi al-awwal, as Diyanet prints
+    it, not on the 12th).
+    """
     idx: dict[tuple, list] = {}
     for rd in year_holidays(year, cal):
-        idx.setdefault((rd.hijri[1], rd.hijri[2]), []).append(rd)
+        _, month, day = rd.observed_hijri_date
+        idx.setdefault((month, day), []).append(rd)
     return idx
 
 
 def _holiday_dict(rd, lang, g, today):
+    # ``g`` is the cell's own Gregorian date, which now equals rd.observed.
     return {
         "key": rd.key, "kind": rd.kind, "kind_label": _kind_label(lang, rd.kind),
         "name": rd.name(lang), "description": _desc(lang, rd.key),
